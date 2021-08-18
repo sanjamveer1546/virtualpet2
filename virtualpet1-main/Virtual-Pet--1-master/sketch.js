@@ -11,55 +11,65 @@ function setup() {
 
   database = firebase.database();
  
-  foodStock=database.ref('Food');
-  foodStock.on("value",function(data){
-   foodS=data.val();
-  });
+ 
+  foodObj= new Food();
+  foodObj.getFoodStock();
+
+  database.ref("FeedTime").on("value",function(data){
+     lastFed=data.val()
+  })
 
   dog=createSprite(250,350,20,20);
   dog.addImage("value",dogImg)
   dog.scale=0.2;
-  foodObj= new Food()
+  
   btnFeed = createButton("Feed the dog")
-  btnFeed.position(700,95);
+  btnFeed.position(500,95);
   btnFeed.mousePressed(feedDog);
 
   btnAddFood= createButton("Add Food")
-  btnAddFood.position(800,95)
-  btnAddFood.mousePessed(addFoods);
+  btnAddFood.position(600,95)
+  btnAddFood.mousePressed(addFoods);
 }
 
+ function feedDog(){ 
+   if(foodObj.foodStock>0){
+     console.log("feeding")
+      foodObj.deductFood();
+     database.ref("/").update({
+       FeedTime:hour()
+     })
+   } 
+}
+function addFoods(){  
+  
+  foodObj.foodStock++;
+  foodObj.updateFoodStock(foodObj.foodStock);
+}
 
 function draw() {  
   
   background(rgb(46,139,87));
  
-  if(keyWentDown(UP_ARROW)){
-     writeStock(foodS)
-     dog.addImage("value",dogHappy);
-  }
-  
+  foodObj.display();
 
   drawSprites();
   //add styles here
   textSize(20);
   fill(0);
   stroke("white")
-  text("FOOD REMAINING : "+foodS ,120,250);
+  text("FOOD REMAINING : "+foodObj.foodStock ,120,250);
+if(lastFed>12){
+  text("LAST FED : "+lastFed%12+"pm" ,350,30);
+
 }
-
-function writeStock(x){
-
-if(x<=0){
-  x=0;
+else if(lastFed==12){
+  text("LAST FED : 12 noon",350,30);
 }
 else{
-  x=x-1;
+  text("LAST FED : "+lastFed+"am" ,350,30);
 }
 
- database.ref('/').update({
-    Food : x
-  })
-}
 
+}
 

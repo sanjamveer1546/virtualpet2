@@ -1,12 +1,14 @@
 class Food {
+
     constructor(){
         this.lastFed=null;
-        this.foodStock=0;
+        this.foodStock= 0 ;
         this.image=loadImage("images/Milk.png")
     } 
     getFoodStock(){
         database.ref("Food").on("value",function(data){
-            this.foodStock= data.val();
+           console.log("getting",this.foodStock);
+            this.foodStock = data.val();
         })
     }
     updateFoodStock(food){
@@ -15,9 +17,11 @@ class Food {
         })
     } 
     deductFood(){
-       getFoodStock()
-       this.foodStock-=1;
-       updateFoodStock(this.foodStock)
+      
+       this.foodStock--;
+         database.ref("/").update({
+            Food:this.foodStock
+        })
     }
     display(){
         var x =80;
